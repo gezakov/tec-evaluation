@@ -45,12 +45,12 @@ function set_idx(dataset_idx) {
   var text = info.trg;
   var edits = info.edits;
   var edit_states = [0,0,0];
+  document.getElementById('srctxt').innerText = srctext;
   updateText(text, edits, edit_states);
 }
 
 var srctext = '中华人民共和国，建成中国，是一个位于东亚的社会主义国家，成立于1949年10月1日，首都为北京市';
 
-document.getElementById('srctxt').innerText = srctext;
 
 
 
