@@ -3,12 +3,8 @@
 var container = document.getElementById('editor');
 var editor = new Quill(container);
 
-var buffertext_list = [
-  '❶',
-  '❷',
-  '❸',
-  '❹',
-];
+// [chr(ord('❶')+idx) for idx in range(10)]
+var buffertext_list = ['❶', '❷', '❸', '❹', '❺', '❻', '❼', '❽', '❾', '❿'];
 
 var color_list = [
   'rgb(0,0,255)',
