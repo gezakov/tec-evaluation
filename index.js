@@ -121,9 +121,9 @@ function updateText(text, edits, edit_states) {
     editor.enable()
     $('#instructions').text('')
     if (dataset_idx + 1 < dataset.length) {
-      $('#instructions').append($('<button>').css('font-size', '30px').text('Click here when finished editing to move to the next segment').click(x => set_idx(++dataset_idx)))
+      $('#instructions').append($('<button>').css({'font-size': '30px', 'cursor': 'pointer'}).text('Click here when finished editing to move to the next segment').click(x => set_idx(++dataset_idx)))
     } else {
-      $('#instructions').append($('<button>').css('font-size', '30px').text('Click here when done'))
+      $('#instructions').append($('<button>').css({'font-size': '30px', 'cursor': 'pointer'}).text('Click here when done'))
     }
   }
   //editor.formatText(5, 7, {'color': 'rgb(0,0,255)'});
