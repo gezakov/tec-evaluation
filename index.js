@@ -6,6 +6,20 @@
 //   }
 // }
 
+function downloadFile(filename, fileContents) {
+  var element = document.createElement('a');
+  element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(fileContents));
+  element.setAttribute('download', filename);
+
+  element.style.display = 'none';
+  document.body.appendChild(element);
+
+  element.click();
+
+  document.body.removeChild(element);
+}
+
+
 function generateRandCondListFromSeed(seed, length) {
   var randNumGen = new Math.seedrandom(seed);
   var cond_list = []
@@ -21,6 +35,17 @@ function generateRandCondListFromSeed(seed, length) {
     }
   }
   return cond_list;
+}
+
+function getAllLoggedData(callback) {
+  var logged_data = {};
+  localforage.iterate(
+    function(val, key) {
+      logged_data[key] = val;
+    }, function() {
+      callback(logged_data);
+    }
+  );
 }
 
 function main() {
@@ -101,17 +126,16 @@ function main() {
   function show_done() {
     $('#interface').text('');
     $('#interface').append($('<div>').text('You are now done. Click the button below to download your results and email them back:'));
-    $('#interface').append($('<button>').css({'font-size': '30px', 'cursor': 'pointer'}).text('Download results').click(x => {alert('TODO this is not yet implemented');}));
+    $('#interface').append($('<button>').css({'font-size': '30px', 'cursor': 'pointer'}).text('Download results').click(function() {
+      getAllLoggedData(function(logged_data) {
+        downloadFile('logged_data.txt', JSON.stringify(logged_data));
+      });
+    }));
     $('#interface').append($('<div>').text('If the above download button does not work, press this button and copy-paste the text and email it back'));
     $('#interface').append($('<button>').css({'font-size': '30px', 'cursor': 'pointer'}).text('Show results').click(function() {
-      var logged_data = {};
-      localforage.iterate(
-        function(val, key) {
-          logged_data[key] = val;
-        }, function() {
-          $('#interface').text(JSON.stringify(logged_data));
-        }
-      );
+      getAllLoggedData(function(logged_data) {
+        $('#interface').text(JSON.stringify(logged_data));
+      });
     }));
   }
 
