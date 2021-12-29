@@ -74,7 +74,8 @@ function main() {
   function finish_current() {
     addlog({evt: 'done', final_text: editor.getText()});
     // TODO need to send off logs here
-    localStorage['log' + dataset_idx] = JSON.stringify(logitems);
+    //localStorage['log' + dataset_idx] = JSON.stringify(logitems);
+    localforage.setItem('log' + dataset_idx, logitems);
     logitems = [];
   }
 
@@ -83,7 +84,16 @@ function main() {
     $('#interface').append($('<div>').text('You are now done. Click the button below to download your results and email them back:'));
     $('#interface').append($('<button>').css({'font-size': '30px', 'cursor': 'pointer'}).text('Download results').click(x => {alert('TODO this is not yet implemented');}));
     $('#interface').append($('<div>').text('If the above download button does not work, press this button and copy-paste the text and email it back'));
-    $('#interface').append($('<button>').css({'font-size': '30px', 'cursor': 'pointer'}).text('Show results').click(x => {$('#interface').text(JSON.stringify(localStorage))}));
+    $('#interface').append($('<button>').css({'font-size': '30px', 'cursor': 'pointer'}).text('Show results').click(function() {
+      var logged_data = {};
+      localforage.iterate(
+        function(val, key) {
+          logged_data[key] = val;
+        }, function() {
+          $('#interface').text(JSON.stringify(logged_data));
+        }
+      );
+    }));
   }
 
   function next_idx() {
