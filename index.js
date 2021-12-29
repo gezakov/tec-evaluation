@@ -14,6 +14,11 @@ function main() {
     return
   }
 
+  var randNumGen = new Math.seedrandom(email);
+  var cond_list = []
+  for (var idx = 0; idx < dataset.length; ++idx) {
+    cond_list[idx] = Math.round(randNumGen());
+  }
 
   var dataset_idx = parseInt(localStorage.dataset_idx)
   if (isNaN(dataset_idx)) {
@@ -74,7 +79,6 @@ function main() {
   function finish_current() {
     addlog({evt: 'done', final_text: editor.getText()});
     // TODO need to send off logs here
-    //localStorage['log' + dataset_idx] = JSON.stringify(logitems);
     localforage.setItem('log' + dataset_idx, logitems);
     logitems = [];
   }
@@ -105,7 +109,7 @@ function main() {
     var info = dataset[dataset_idx];
     var srctext = info.src;
     var text = info.tgt;
-    var cond = Math.round(Math.random())
+    var cond = cond_list[dataset_idx];
     var edits = info.edits;
     var edit_states = edits.map(x => 0);
     if (cond === 0) {
