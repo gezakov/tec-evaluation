@@ -5,6 +5,24 @@
 //     dataset[idx].cond = Math.round(Math.random())
 //   }
 // }
+
+function generateRandCondListFromSeed(seed, length) {
+  var randNumGen = new Math.seedrandom(seed);
+  var cond_list = []
+  for (var idx = 0; idx < length; ++idx) {
+    cond_list[idx] = 0;
+  }
+  num_conds_to_reassign = Math.floor((length / 2) + randNumGen());
+  while (num_conds_to_reassign > 0) {
+    var idx = Math.floor(randNumGen() * length);
+    if (cond_list[idx] === 0) {
+      cond_list[idx] = 1;
+      num_conds_to_reassign--;
+    }
+  }
+  return cond_list;
+}
+
 function main() {
 
   var search_params = new URLSearchParams(window.location.search);
@@ -14,11 +32,8 @@ function main() {
     return
   }
 
-  var randNumGen = new Math.seedrandom(email);
-  var cond_list = []
-  for (var idx = 0; idx < dataset.length; ++idx) {
-    cond_list[idx] = Math.round(randNumGen());
-  }
+  var cond_list = generateRandCondListFromSeed(email, dataset.length);
+  window.cond_list = cond_list;
 
   var dataset_idx = parseInt(localStorage.dataset_idx)
   if (isNaN(dataset_idx)) {
