@@ -104,6 +104,8 @@ function main() {
       edit_states = [];
     }
     document.getElementById('srctxt').innerText = srctext;
+    document.getElementById('segment-id').innerText = `Segment ${dataset_idx} / ${dataset.length}`;
+    document.getElementById('segment-condition').innerText = cond ? "🟨 Suggestions shown" : "⬜️ Suggestions hidden (if any)";
     updateText(text, edits, edit_states);
     addlog({evt: 'set_idx', src: srctext, tgt: text, edits: edits, cond: cond, email: email});
   }
