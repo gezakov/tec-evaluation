@@ -64,7 +64,7 @@ function generateUUID() { // Public Domain/MIT
   });
 }
 
-var backend_host = 'localhost:8080'
+var backend_host = 'tec.liltstat.com'
 
 function sendData(rows, data, callback) {
   var haveRunCallback = false;
