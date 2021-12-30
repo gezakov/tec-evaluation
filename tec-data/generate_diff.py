@@ -3,13 +3,17 @@ import difflib
 import json
 
 output = []
+with open("selected_segment_idxs.txt") as f:
+    lines = f.readlines()
+    selected_idxs = set([int(l) for l in lines])
+
 for filebase in ['test']:
   srclines = open(filebase + '.src').readlines()
   tgtlines = open(filebase + '.confirmed_tgt').readlines()
   teclines = open(filebase + '.tec').readlines()
-  for src,tgt,tec in zip(srclines, tgtlines, teclines):
-    if tgt == tec:
-      continue
+  for i, (src,tgt,tec) in enumerate(zip(srclines, tgtlines, teclines)):
+    if i not in selected_idxs:
+        continue
     idx = 0
     from_text = []
     to_text = []
