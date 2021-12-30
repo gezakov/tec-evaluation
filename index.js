@@ -48,6 +48,45 @@ function getAllLoggedData(callback) {
   );
 }
 
+function generateUUID() { // Public Domain/MIT
+  var d = new Date().getTime();//Timestamp
+  var d2 = (performance && performance.now && (performance.now()*1000)) || 0;//Time in microseconds since page-load or 0 if unsupported
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      var r = Math.random() * 16;//random number between 0 and 16
+      if(d > 0){//Use timestamp until depleted
+          r = (d + r)%16 | 0;
+          d = Math.floor(d/16);
+      } else {//Use microseconds since page-load if supported
+          r = (d2 + r)%16 | 0;
+          d2 = Math.floor(d2/16);
+      }
+      return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+  });
+}
+
+var backend_host = 'localhost:8080'
+
+function sendData(rows, data, callback) {
+  var haveRunCallback = false;
+  var cbname = 'cb' + Math.floor(Math.random() * 2147483647)
+  var script_tag = document.createElement('script');
+  script_tag.setAttribute('id', cbname);
+  script_tag.setAttribute('src', window.location.protocol + '//' + backend_host + '/addlog?callback=' + cbname + '&rows=' + rows + '&data=' + data);
+  window[cbname] = function(res) {
+    //console.log('callback! ' + cbname)
+    //console.log(res)
+    delete window[cbname]
+    document.querySelector('#' + cbname).remove();
+    if (!haveRunCallback) {
+      haveRunCallback = true;
+      callback(res);
+    }
+  }
+  document.head.appendChild(script_tag)
+}
+
+var compressLib = JsonUrl('lzma');
+
 function main() {
 
   var search_params = new URLSearchParams(window.location.search);
@@ -72,7 +111,6 @@ function main() {
     logitem.idx = dataset_idx
     logitem.time = Date.now();
     logitems.push(logitem);
-    console.log(logitem)
   }
 
   addlog({evt: 'loadpage'});
@@ -118,9 +156,14 @@ function main() {
 
   function finish_current() {
     addlog({evt: 'done', final_text: editor.getText()});
-    // TODO need to send off logs here
-    localforage.setItem('log' + dataset_idx, logitems);
+    compressLib.compress(logitems).then(function(logItemsEncoded) {
+      localforage.setItem('log' + dataset_idx, logItemsEncoded);
+      var insertId = generateUUID();
+      sendData(encodeURIComponent(JSON.stringify({insertId: insertId, dataVersion: 1, userId: email})), logItemsEncoded, function() {console.log(insertId)});
+    })
     logitems = [];
+    //var logItemsEncoded = LZString.compressToEncodedURIComponent(JSON.stringify(logitems))    
+    //sendData({insertId: insertId, dataVersion: 1, userId: email}, logitems, function() {console.log(insertId)});
   }
 
   function show_done() {
@@ -138,6 +181,8 @@ function main() {
       });
     }));
   }
+
+  window.show_done = show_done;
 
   function next_idx() {
     localStorage.dataset_idx = ++dataset_idx;
