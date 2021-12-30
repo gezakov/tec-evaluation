@@ -5,6 +5,49 @@
 //     dataset[idx].cond = Math.round(Math.random())
 //   }
 // }
+
+function downloadFile(filename, fileContents) {
+  var element = document.createElement('a');
+  element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(fileContents));
+  element.setAttribute('download', filename);
+
+  element.style.display = 'none';
+  document.body.appendChild(element);
+
+  element.click();
+
+  document.body.removeChild(element);
+}
+
+
+function generateRandCondListFromSeed(seed, length) {
+  var randNumGen = new Math.seedrandom(seed);
+  var cond_list = []
+  for (var idx = 0; idx < length; ++idx) {
+    cond_list[idx] = 0;
+  }
+  num_conds_to_reassign = Math.floor((length / 2) + randNumGen());
+  while (num_conds_to_reassign > 0) {
+    var idx = Math.floor(randNumGen() * length);
+    if (cond_list[idx] === 0) {
+      cond_list[idx] = 1;
+      num_conds_to_reassign--;
+    }
+  }
+  return cond_list;
+}
+
+function getAllLoggedData(callback) {
+  var logged_data = {};
+  localforage.iterate(
+    function(val, key) {
+      logged_data[key] = val;
+    }, function() {
+      callback(logged_data);
+    }
+  );
+}
+
 function main() {
 
   var search_params = new URLSearchParams(window.location.search);
@@ -14,6 +57,8 @@ function main() {
     return
   }
 
+  var cond_list = generateRandCondListFromSeed(email, dataset.length);
+  window.cond_list = cond_list;
 
   var dataset_idx = parseInt(localStorage.dataset_idx)
   if (isNaN(dataset_idx)) {
@@ -74,16 +119,24 @@ function main() {
   function finish_current() {
     addlog({evt: 'done', final_text: editor.getText()});
     // TODO need to send off logs here
-    localStorage['log' + dataset_idx] = JSON.stringify(logitems);
+    localforage.setItem('log' + dataset_idx, logitems);
     logitems = [];
   }
 
   function show_done() {
     $('#interface').text('');
     $('#interface').append($('<div>').text('You are now done. Click the button below to download your results and email them back:'));
-    $('#interface').append($('<button>').css({'font-size': '30px', 'cursor': 'pointer'}).text('Download results').click(x => {alert('TODO this is not yet implemented');}));
+    $('#interface').append($('<button>').css({'font-size': '30px', 'cursor': 'pointer'}).text('Download results').click(function() {
+      getAllLoggedData(function(logged_data) {
+        downloadFile('logged_data.txt', JSON.stringify(logged_data));
+      });
+    }));
     $('#interface').append($('<div>').text('If the above download button does not work, press this button and copy-paste the text and email it back'));
-    $('#interface').append($('<button>').css({'font-size': '30px', 'cursor': 'pointer'}).text('Show results').click(x => {$('#interface').text(JSON.stringify(localStorage))}));
+    $('#interface').append($('<button>').css({'font-size': '30px', 'cursor': 'pointer'}).text('Show results').click(function() {
+      getAllLoggedData(function(logged_data) {
+        $('#interface').text(JSON.stringify(logged_data));
+      });
+    }));
   }
 
   function next_idx() {
@@ -95,7 +148,7 @@ function main() {
     var info = dataset[dataset_idx];
     var srctext = info.src;
     var text = info.tgt;
-    var cond = Math.round(Math.random())
+    var cond = cond_list[dataset_idx];
     var edits = info.edits;
     var edit_states = edits.map(x => 0);
     if (cond === 0) {
