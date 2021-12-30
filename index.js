@@ -166,9 +166,9 @@ function main() {
           $('<span>').css({'margin-right': '5px', 'cursor': 'pointer'}).text('✅').click(x => suggestionClicked(idx, true)),
           $('<span>').css({'margin-right': '5px', 'cursor': 'pointer'}).text('❌').click(x => suggestionClicked(idx, false)),
           $('<span>').text(buffertext).css('color', color),
-          $('<span>').text(origtext).css('color', color),
+          $('<span>').text(origtext).css({'color': color, 'border': `solid ${color} 2px`}),
           $('<span>').text(' → '),
-          $('<span>').text(replacetext),
+          $('<span>').css({'border': 'solid black 2px'}).text(replacetext),
         ])
         $('#suggestions').append(sugdiv);
       })(suggestion);
