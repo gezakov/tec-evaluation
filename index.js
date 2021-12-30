@@ -180,7 +180,7 @@ function main() {
         $('#interface').text(JSON.stringify(logged_data));
       });
     }));
-    $('#interface').append($('<div>').text('Please fill out the survey linked from the instructions document.'); 
+    $('#interface').append($('<div>').text('Please fill out the survey linked from the instructions document.')); 
   }
 
   window.show_done = show_done;
