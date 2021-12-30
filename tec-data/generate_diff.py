@@ -3,10 +3,10 @@ import difflib
 import json
 
 output = []
-for filebase in ['test517099', 'test517100']:
+for filebase in ['test']:
   srclines = open(filebase + '.src').readlines()
   tgtlines = open(filebase + '.confirmed_tgt').readlines()
-  teclines = open(filebase + '.new_tec').readlines()
+  teclines = open(filebase + '.tec').readlines()
   for src,tgt,tec in zip(srclines, tgtlines, teclines):
     if tgt == tec:
       continue
@@ -29,6 +29,10 @@ for filebase in ['test517099', 'test517100']:
           to_text.append(rest)
         elif start == '  ':
           #diff_blocks.append([idx, len(' '.join(from_text)), tgt[diff_block_start_idx:diff_block_start_idx + len(' '.join(from_text))], ' '.join(from_text), ' '.join(to_text)])
+          # special case for insertion since our diffing is token-based: insert a space after the newly inserted token
+          if len(from_text) == 0: 
+            to_text.append("")
+
           diff_blocks.append([diff_block_start_idx, len(' '.join(from_text)), ' '.join(to_text)])
           in_diff_block = False
           diff_block_start_idx = None
@@ -47,7 +51,12 @@ for filebase in ['test517099', 'test517100']:
           diff_block_start_idx = idx
         elif start == '  ':
           idx += len(rest) + 1
+
     if len(from_text) > 0 or len(to_text) > 0:
+      # special case for insertion since our diffing is token-based: insert a space after the newly inserted token
+      if len(from_text) == 0: 
+        to_text.append("")
+
       #diff_blocks.append([idx, len(' '.join(from_text)), tgt[diff_block_start_idx:diff_block_start_idx + len(' '.join(from_text))], ' '.join(from_text), ' '.join(to_text)])
       diff_blocks.append([diff_block_start_idx, len(' '.join(from_text)), ' '.join(to_text)])
       in_diff_block = False
@@ -59,6 +68,9 @@ for filebase in ['test517099', 'test517100']:
       'tgt': tgt,
       'edits': diff_blocks,
     }
+    if "GUIDANCE LINE" in tgt:
+      import pdb; pdb.set_trace()
+
     #for x in diff_blocks:
     #  if x[2] != x[3]:
     #    print(output_item)
