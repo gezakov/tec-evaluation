@@ -155,9 +155,10 @@ function main() {
   // ]
 
   function finish_current() {
+    var current_dataset_idx = dataset_idx;
     addlog({evt: 'done', final_text: editor.getText()});
     compressLib.compress(logitems).then(function(logItemsEncoded) {
-      localforage.setItem('log' + dataset_idx, logItemsEncoded);
+      localforage.setItem('log' + current_dataset_idx, logItemsEncoded);
       var insertId = generateUUID();
       sendData(encodeURIComponent(JSON.stringify({insertId: insertId, dataVersion: 1, userId: email})), logItemsEncoded, function() {console.log(insertId)});
     })
