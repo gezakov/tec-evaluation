@@ -91,7 +91,7 @@ function main() {
 
   var search_params = new URLSearchParams(window.location.search);
   var email = search_params.get('email')
-  if (email === undefined || email === null || email.trim().length === 0 || email.indexOf('@') === -1) {
+  if (email === undefined || email === null || email.trim().length === 0 || email.indexOf('@') === -1 || email === 'youremail@website.com') {
     $('#interface').text('Did you forget to put in your email or inputted an invalid email address? Please double-check the link from the instructions.')
     return
   }
